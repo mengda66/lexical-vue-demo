@@ -17,5 +17,6 @@ import Editor from './Editor.vue'
   height: 500px;
   border: 1px solid #aaa;
   border-radius: 4px;
+  overflow: scroll;
 }
 </style>

@@ -170,3 +170,54 @@ export function registerLexicalTextEntity<T extends TextNode>(
   const removeReverseNodeTransform = editor.registerNodeTransform(targetNode, reverseNodeTransform)
   return [removePlainTextTransform, removeReverseNodeTransform]
 }
+
+const positionMenu = () => {
+  anchorElementRef.current.style.top = anchorElementRef.current.style.bottom;
+  const rootElement = editor.getRootElement();
+  const containerDiv = anchorElementRef.current;
+
+  const menuEle = containerDiv.firstChild as HTMLElement;
+  if (rootElement !== null && resolution !== null) {
+    const { left, top, width, height } = resolution.getRect();
+    const anchorHeight = anchorElementRef.current.offsetHeight; // use to position under anchor
+    containerDiv.style.top = `${top + window.pageYOffset + anchorHeight + 3
+      }px`;
+    containerDiv.style.left = `${left + window.pageXOffset}px`;
+    containerDiv.style.height = `${height}px`;
+    containerDiv.style.width = `${width}px`;
+    if (menuEle !== null) {
+      menuEle.style.top = `${top}`;
+      const menuRect = menuEle.getBoundingClientRect();
+      const menuHeight = menuRect.height;
+      const menuWidth = menuRect.width;
+
+      const rootElementRect = rootElement.getBoundingClientRect();
+
+      if (left + menuWidth > rootElementRect.right) {
+        containerDiv.style.left = `${rootElementRect.right - menuWidth + window.pageXOffset
+          }px`;
+      }
+      if (
+        (top + menuHeight > window.innerHeight ||
+          top + menuHeight > rootElementRect.bottom) &&
+        top - rootElementRect.top > menuHeight + height
+      ) {
+        containerDiv.style.top = `${top - menuHeight + window.pageYOffset - height
+          }px`;
+      }
+    }
+
+    if (!containerDiv.isConnected) {
+      if (className != null) {
+        containerDiv.className = className;
+      }
+      containerDiv.setAttribute('aria-label', 'Typeahead menu');
+      containerDiv.setAttribute('id', 'typeahead-menu');
+      containerDiv.setAttribute('role', 'listbox');
+      containerDiv.style.display = 'block';
+      containerDiv.style.position = 'absolute';
+      parent.append(containerDiv);
+    }
+    anchorElementRef.current = containerDiv;
+    rootElement.setAttribute('aria-controls', 'typeahead-menu');
+  }

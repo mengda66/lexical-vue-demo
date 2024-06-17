@@ -15,7 +15,9 @@
       <LexicalOnChangePlugin @change="onChange" />
       <onFocusComponent :state="editorState" @modalVisibleChange="onModalVisibleChange"/>
 
-      <varsModalComponent v-show="modalVisible"/>
+      <Teleport to="body">
+        <varsModalComponent v-show="modalVisible" :matchInfoObj="matchInfoObj"/>
+      </Teleport>
     </div>
   </LexicalComposer>
 </template>
@@ -38,7 +40,7 @@ import {
   LexicalPlainTextPlugin,
   LexicalRichTextPlugin,
 } from "lexical-vue";
-import { onMounted, ref } from "vue";
+import { onMounted, ref, Teleport } from "vue";
 
 const config = {
   namespace: "MyEditor",
@@ -53,13 +55,18 @@ const config = {
 const editorState = ref()
 
 const onChange = (e: any) => {
-  console.log("change", e);
+  // console.log("change", e);
   editorState.value = e
 };
 
 const modalVisible = ref(false)
-const onModalVisibleChange = (flag: boolean) => {
+const matchInfoObj = ref(null)
+const onModalVisibleChange = (flag: boolean, matchObj: any) => {
+  if (flag) {
+    matchInfoObj.value = matchObj
+  }
   modalVisible.value = flag
+  console.log(matchObj);
 }
 </script>
 
